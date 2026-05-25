@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spesa Smart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h2 { color: #2c3e50; }
+        textarea {
+            width: 100%;
+            max-width: 400px;
+            height: 150px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
+        button:active { background-color: #2ecc71; }
+        #risultato {
+            width: 100%;
+            max-width: 400px;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-sizing: border-box;
+        }
+        .corsia-titolo {
+            font-weight: bold;
+            color: #2980b9;
+            margin-top: 15px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+        }
+        .prodotto {
+            margin: 5px 0 5px 15px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Lista della Spesa</h2>
+    
+    <textarea id="inputSpesa" placeholder="Incolla qui la lista di WhatsApp..."></textarea>
+    <button onclick="ordinaSpesa()">Ordina per Percorso</button>
+
+    <div id="risultato"></div>
+
+    <script>
+        // ==========================================
+        // AREA DI CONFIGURAZIONE: MODIFICA QUI
+        // ==========================================
+
+        // 1. Mappa delle corsie (numero più basso = più vicino all'ingresso)
+        const mappaSupermercato = {
+            "ortofrutta": 1,
+            "panetteria": 2,
+            "freschi": 3,
+            "scatolame": 4,
+            "surgelati": 5,
+            "bevande": 6,
+            "cura_casa": 7,
+            "sconosciuto": 99 // Prodotti non mappati vanno in fondo
+        };
+
+        // 2. Catalogo prodotti (associa ogni prodotto alla sua corsia)
+        const catalogoProdotti = {
+            "mele": "ortofrutta", "insalata": "ortofrutta", "pomodori": "ortofrutta",
+            "pane": "panetteria", "focaccia": "panetteria",
+            "mozzarella": "freschi", "latte": "freschi", "uova": "freschi",
+            "pasta": "scatolame", "passata": "scatolame", "tonno": "scatolame",
+            "pizza": "surgelati", "gelato": "surgelati",
+            "acqua": "bevande", "birra": "bevande", "vino": "bevande",
+            "scottex": "cura_casa", "sapone": "cura_casa", "dentifricio": "cura_casa"
+        };
+
+        // ==========================================
+        // LOGICA DELL'ALGORITMO
+        // ==========================================
+
+        function ordinaSpesa() {
+            const testoInput = document.getElementById('inputSpesa').value;
+            if (!testoInput.trim()) return;
+
+            // Dividiamo il testo per riga e puliamo gli spazi
+            const righe = testoInput.split('\n').map(r => r.trim().toLowerCase()).filter(r => r.length > 0);
+
+            // Costruiamo un array di oggetti per ogni riga
+            let listaDaOrdinare = righe.map(nomeProdotto => {
+                let categoriaAssegnata = "sconosciuto";
+                
+                // Cerchiamo se una parola del catalogo è contenuta nel nome inserito
+                for (const [prodottoCatalogo, categoria] of Object.entries(catalogoProdotti)) {
+                    if (nomeProdotto.includes(prodottoCatalogo)) {
+                        categoriaAssegnata = categoria;
+                        break;
+                    }
+                }
+
+                return {
+                    nomeOriginale: nomeProdotto,
+                    categoria: categoriaAssegnata,
+                    ordineCorsia: mappaSupermercato[categoriaAssegnata] || 99
+                };
+            });
+
+            // L'equivalente del nostro std::sort
+            listaDaOrdinare.sort((a, b) => a.ordineCorsia - b.ordineCorsia);
+
+            // Stampa a schermo
+            mostraRisultato(listaDaOrdinare);
+        }
+
+        function mostraRisultato(lista) {
+            const divRisultato = document.getElementById('risultato');
+            divRisultato.innerHTML = ''; // Pulisce i risultati precedenti
+
+            let corsiaAttuale = "";
+
+            lista.forEach(item => {
+                // Se cambiamo corsia, stampiamo il titolo della corsia
+                if (item.categoria !== corsiaAttuale) {
+                    const titolo = document.createElement('div');
+                    titolo.className = 'corsia-titolo';
+                    titolo.innerText = item.categoria.toUpperCase() + (item.ordineCorsia === 99 ? " (Da cercare)" : "");
+                    divRisultato.appendChild(titolo);
+                    corsiaAttuale = item.categoria;
+                }
+
+                // Stampiamo il prodotto
+                const rigaProdotto = document.createElement('div');
+                rigaProdotto.className = 'prodotto';
+                // Rimettiamo la prima lettera maiuscola per estetica
+                rigaProdotto.innerText = "- " + item.nomeOriginale.charAt(0).toUpperCase() + item.nomeOriginale.slice(1);
+                divRisultato.appendChild(rigaProdotto);
+            });
+        }
+    </script>
+</body>
+</html>
