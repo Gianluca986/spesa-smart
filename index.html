@@ -56,9 +56,26 @@
             border-bottom: 2px solid #ecf0f1;
             padding-bottom: 5px;
         }
-        .prodotto {
-            margin: 5px 0 5px 15px;
+        .prodotto-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0 10px 10px;
+        }
+        .prodotto-container input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 12px;
+            accent-color: #27ae60;
+            cursor: pointer;
+        }
+        .prodotto-container label {
             font-size: 16px;
+            cursor: pointer;
+            transition: color 0.2s, text-decoration 0.2s;
+        }
+        .prodotto-container input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: #95a5a6;
         }
     </style>
 </head>
@@ -76,74 +93,75 @@
         // AREA DI CONFIGURAZIONE: MODIFICA QUI
         // ==========================================
 
-        // 1. Mappa delle corsie (numero più basso = più vicino all'ingresso)
         const mappaSupermercato = {
-		"ortofrutta": 1,
-		"panetteria": 2,
-		"gastronomia": 3,
-		"freschi": 4,
-		"macelleria": 5,
-		"toast": 6,
-		"merenda": 7,
-		"pasta": 8,
-		"olio": 9,
-		"bagno": 10,
-   	    	"lavatrice": 11,	
-		"cura_casa": 12,
-		"snacks": 13,
-		"succhi": 14,
-		"bibite": 15,
-		"surgelati": 16,
-		"sconosciuto": 99 // Prodotti non mappati vanno in fondo
+            "ortofrutta": 1,
+            "panetteria": 2,
+            "gastronomia": 3,
+            "freschi": 4,
+            "macelleria": 5,
+            "toast": 6,
+            "merenda": 7,
+            "cancelleria": 8, // Inserito tra 7 e 9
+            "pasta": 9,       // Scalato da 8 a 9
+            "olio": 10,       // Scalato da 9 a 10
+            "bagno": 11,      // E così via...
+            "lavatrice": 12,    
+            "cura_casa": 13,
+            "snacks": 14,
+            "succhi": 15,
+            "bibite": 16,
+            "surgelati": 17,
+            "sconosciuto": 99
         };
 
-        // 2. Catalogo prodotti (associa ogni prodotto alla sua corsia)
         const catalogoProdotti = {
-		"mele": "ortofrutta", "insalata": "ortofrutta", "pomodori": "ortofrutta",
-		"fragole": "ortofrutta", "melone": "ortofrutta", "anguria": "ortofrutta",
-		"uva": "ortofrutta", "pesche": "ortofrutta", "kiwi": "ortofrutta", "banane": "ortofrutta",
-		"ananas": "ortofrutta", "zucchine": "ortofrutta", "carote": "ortofrutta", "patate": "ortofrutta",
-		"cetrioli": "ortofrutta", "finocchi": "ortofrutta", "cipolla": "ortofrutta", 
+            "mele": "ortofrutta", "insalata": "ortofrutta", "pomodori": "ortofrutta",
+            "fragole": "ortofrutta", "melone": "ortofrutta", "anguria": "ortofrutta",
+            "uva": "ortofrutta", "pesche": "ortofrutta", "kiwi": "ortofrutta", "banane": "ortofrutta",
+            "ananas": "ortofrutta", "zucchine": "ortofrutta", "carote": "ortofrutta", "patate": "ortofrutta",
+            "cetrioli": "ortofrutta", "finocchi": "ortofrutta", "cipolla": "ortofrutta", 
 
-		"pane": "panetteria", "focaccia": "panetteria", 
+            "pane": "panetteria", "focaccia": "panetteria", 
 
-		"olive": "gastronomia", "prosciutto": "gastronomia", "mortadella": "gastronomia", 
-		"speck": "gastronomia", "pollo": "gastronomia",
-		
-		"latte": "freschi", "mozzarelle": "freschi", "sottilette": "freschi", "pesto": "freschi",
-		"tortellini": "freschi", "trofie": "freschi", "parmiggiano": "freschi", "salame": "freschi",
-		"burro": "freschi",
+            "olive": "gastronomia", "prosciutto": "gastronomia", "mortadella": "gastronomia", 
+            "speck": "gastronomia", "pollo": "gastronomia",
+            
+            "latte": "freschi", "mozzarelle": "freschi", "sottilette": "freschi", "pesto": "freschi",
+            "tortellini": "freschi", "trofie": "freschi", "parmiggiano": "freschi", "salame": "freschi",
+            "burro": "freschi",
 
-		"uova": "macelleria", "petto": "macelleria", "trita": "macelleria", "hamburger": "macelleria",
-		"salsiccia": "macelleria",
+            "uova": "macelleria", "petto": "macelleria", "trita": "macelleria", "hamburger": "macelleria",
+            "salsiccia": "macelleria",
 
-		"toast": "toast", "grissini": "toast", "crostini": "toast", "formaggio grattuggiato": "toast", "panini": "toast",
-		"barrette": "toast", 
-		
-		"torta": "merenda", "biscotti": "merenda", "gocciole": "merenda", "lievito": "merenda", "farina": "merenda",
+            "toast": "toast", "grissini": "toast", "crostini": "toast", "grattuggiato": "toast", "panini": "toast",
+            "barrette": "toast", "caffe": "toast", "marmellata": "toast",
+            
+            "galbusera": "cancelleria",
+            
+            "torta": "merenda", "biscotti": "merenda", "gocciole": "merenda", "lievito": "merenda", "farina": "merenda",
 
-		"pasta": "pasta", "tagliatelle": "pasta", "riso": "pasta", "penne": "pasta",
-		
-		"ketchup": "olio", "olio": "olio", "sugo": "olio", "olio di girasole": "olio", "sale": "olio", "tonno": "olio",
-		"piselli": "olio", "ceci": "olio",
+            "pasta": "pasta", "tagliatelle": "pasta", "riso": "pasta", "penne": "pasta",
+            
+            "ketchup": "olio", "olio": "olio", "sugo": "olio", "olio di girasole": "olio", "sale": "olio", "tonno": "olio",
+            "piselli": "olio", "ceci": "olio",
 
-		"carta": "bagno", "profumo": "bagno", "assorbenti": "bagno", "bagno schiuma": "bagno", "dentifricio": "bagno", "creme": "bagno",
-		"fazzoletti": "bagno",
+            "carta": "bagno", "profumo": "bagno", "assorbenti": "bagno", "bagno schiuma": "bagno", "dentifricio": "bagno", "creme": "bagno",
+            "fazzoletti": "bagno",
 
-		"detersivo": "lavatrice", 
+            "detersivo": "lavatrice", 
 
-		"pastiglia": "cura_casa", "guanti": "cura_casa", "sale lavastoviglie": "cura_casa", "detertisivo piatti": "cura_casa", "sacchi": "cura_casa", 
-		"sgrassatore": "cura_casa", "lavapavimenti": "cura_casa", "spugne": "cura_casa", "wcnet": "cura_casa", "scottex": "cura_casa", 
+            "pastiglia": "cura_casa", "guanti": "cura_casa", "sale lavastoviglie": "cura_casa", "detertisivo piatti": "cura_casa", "sacchi": "cura_casa",
+            "sgrassatore": "cura_casa", "lavapavimenti": "cura_casa", "spugne": "cura_casa", "wcnet": "cura_casa", "scottex": "cura_casa", 
 
-		"patatine": "snacks", "bretzel": "snacks", "cross": "snacks" , "semi di girasole": "snacks", "arachidi": "snacks" ,
-		
-		"pera": "succhi", "alluminio": "succhi", 
+            "patatine": "snacks", "bretzel": "snacks", "cross": "snacks" , "semi di girasole": "snacks", "arachidi": "snacks",
+            
+            "pera": "succhi", "alluminio": "succhi", 
 
-		"te pesca": "bibite", "coca cola": "bibite", "zucchero": "bibite",
+            "the": "bibite", "coca cola": "bibite", "zucchero": "bibite",
 
-		"ghiaccioli": "surgelati", "cuccioloni": "surgelati", "fragolino": "surgelati", "soffritto": "surgelati", "viennetta": "surgelati", "aglio": "surgelati",
-		"cipolla tritata": "surgelati", "fagiolini": "surgelati", "patatine surgelate": "surgelati", "pizze": "surgelati", "farinata": "surgelati", "vaschette": "surgelati", 
-		"tiramisu": "surgelati",
+            "ghiaccioli": "surgelati", "cuccioloni": "surgelati", "fragolino": "surgelati", "soffritto": "surgelati", "viennetta": "surgelati", "aglio": "surgelati",
+            "cipolla tritata": "surgelati", "fagiolini": "surgelati", "patatine surgelate": "surgelati", "pizze": "surgelati", "farinata": "surgelati", "vaschette": "surgelati",
+            "tiramisu": "surgelati"
         };
 
         // ==========================================
@@ -154,14 +172,11 @@
             const testoInput = document.getElementById('inputSpesa').value;
             if (!testoInput.trim()) return;
 
-            // Dividiamo il testo per riga e puliamo gli spazi
             const righe = testoInput.split('\n').map(r => r.trim().toLowerCase()).filter(r => r.length > 0);
 
-            // Costruiamo un array di oggetti per ogni riga
             let listaDaOrdinare = righe.map(nomeProdotto => {
                 let categoriaAssegnata = "sconosciuto";
                 
-                // Cerchiamo se una parola del catalogo è contenuta nel nome inserito
                 for (const [prodottoCatalogo, categoria] of Object.entries(catalogoProdotti)) {
                     if (nomeProdotto.includes(prodottoCatalogo)) {
                         categoriaAssegnata = categoria;
@@ -176,21 +191,18 @@
                 };
             });
 
-            // L'equivalente del nostro std::sort
             listaDaOrdinare.sort((a, b) => a.ordineCorsia - b.ordineCorsia);
-
-            // Stampa a schermo
             mostraRisultato(listaDaOrdinare);
         }
 
         function mostraRisultato(lista) {
             const divRisultato = document.getElementById('risultato');
-            divRisultato.innerHTML = ''; // Pulisce i risultati precedenti
+            divRisultato.innerHTML = ''; 
 
             let corsiaAttuale = "";
+            let contatoreID = 0; 
 
             lista.forEach(item => {
-                // Se cambiamo corsia, stampiamo il titolo della corsia
                 if (item.categoria !== corsiaAttuale) {
                     const titolo = document.createElement('div');
                     titolo.className = 'corsia-titolo';
@@ -199,12 +211,22 @@
                     corsiaAttuale = item.categoria;
                 }
 
-                // Stampiamo il prodotto
-                const rigaProdotto = document.createElement('div');
-                rigaProdotto.className = 'prodotto';
-                // Rimettiamo la prima lettera maiuscola per estetica
-                rigaProdotto.innerText = "- " + item.nomeOriginale.charAt(0).toUpperCase() + item.nomeOriginale.slice(1);
-                divRisultato.appendChild(rigaProdotto);
+                contatoreID++;
+                
+                const container = document.createElement('div');
+                container.className = 'prodotto-container';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = 'prodotto-' + contatoreID;
+
+                const label = document.createElement('label');
+                label.htmlFor = 'prodotto-' + contatoreID;
+                label.innerText = item.nomeOriginale.charAt(0).toUpperCase() + item.nomeOriginale.slice(1);
+
+                container.appendChild(checkbox);
+                container.appendChild(label);
+                divRisultato.appendChild(container);
             });
         }
     </script>
