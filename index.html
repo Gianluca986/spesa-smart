@@ -90,27 +90,29 @@
 
     <script>
         // ==========================================
-        // AREA DI CONFIGURAZIONE: MODIFICA QUI
+        // AREA DI CONFIGURAZIONE
         // ==========================================
 
         const mappaSupermercato = {
             "ortofrutta": 1,
-            "panetteria": 2,
-            "gastronomia": 3,
-            "freschi": 4,
-            "macelleria": 5,
-            "toast": 6,
-            "merenda": 7,
-            "cancelleria": 8, // Inserito tra 7 e 9
-            "pasta": 9,       // Scalato da 8 a 9
-            "olio": 10,       // Scalato da 9 a 10
-            "bagno": 11,      // E così via...
-            "lavatrice": 12,    
-            "cura_casa": 13,
-            "snacks": 14,
-            "succhi": 15,
-            "bibite": 16,
-            "surgelati": 17,
+            "banco gastronomia": 2,
+            "banco freschi": 3,
+            "banco macelleria": 4,
+            "banco panetteria": 5,
+            "corsia 01 (Colazione, Pane)": 6,
+            "corsia 02 (Biscotti, Cartoleria)": 7,
+            "corsia 03 (Farina, Piatti)": 8,
+            "corsia 04 (Pasta, Riso)": 9,
+            "corsia 05 (Olio, Conserve)": 10,
+            "corsia 06 (Cura Corpo, Infanzia)": 11,
+            "corsia 07 (Igiene Orale, Deodoranti)": 12,
+            "corsia 08 (Carta Igienica)": 13,
+            "corsia 09 (Bucato)": 14,
+            "corsia 10 (Pulizia Casa)": 15,
+            "corsia 11 (Animali, Brico)": 16,
+            "corsia 12 (Snack, Succhi)": 17,
+            "corsia 13 (Carta Casa, Alluminio)": 18,
+            "corsia 14 (Surgelati, Bibite)": 19,
             "sconosciuto": 99
         };
 
@@ -119,49 +121,41 @@
             "fragole": "ortofrutta", "melone": "ortofrutta", "anguria": "ortofrutta",
             "uva": "ortofrutta", "pesche": "ortofrutta", "kiwi": "ortofrutta", "banane": "ortofrutta",
             "ananas": "ortofrutta", "zucchine": "ortofrutta", "carote": "ortofrutta", "patate": "ortofrutta",
-            "cetrioli": "ortofrutta", "finocchi": "ortofrutta", "cipolla": "ortofrutta", 
+            "cetrioli": "ortofrutta", "finocchi": "ortofrutta", "cipolla": "ortofrutta",
 
-            "pane": "panetteria", "focaccia": "panetteria", 
+            "pane": "corsia 01 (Colazione, Pane)", "toast": "corsia 01 (Colazione, Pane)", "grissini": "corsia 01 (Colazione, Pane)", "crostini": "corsia 01 (Colazione, Pane)", "grattuggiato": "corsia 01 (Colazione, Pane)", "panini": "corsia 01 (Colazione, Pane)", "caffe": "corsia 01 (Colazione, Pane)", "marmellata": "corsia 01 (Colazione, Pane)", "zucchero": "corsia 01 (Colazione, Pane)",
 
-            "olive": "gastronomia", "prosciutto": "gastronomia", "mortadella": "gastronomia", 
-            "speck": "gastronomia", "pollo": "gastronomia",
-            
-            "latte": "freschi", "mozzarelle": "freschi", "sottilette": "freschi", "pesto": "freschi",
-            "tortellini": "freschi", "trofie": "freschi", "parmiggiano": "freschi", "salame": "freschi",
-            "burro": "freschi",
+            "galbusera": "corsia 02 (Biscotti, Cartoleria)", "torta": "corsia 02 (Biscotti, Cartoleria)", "biscotti": "corsia 02 (Biscotti, Cartoleria)", "gocciole": "corsia 02 (Biscotti, Cartoleria)", "barrette": "corsia 02 (Biscotti, Cartoleria)",
 
-            "uova": "macelleria", "petto": "macelleria", "trita": "macelleria", "hamburger": "macelleria",
-            "salsiccia": "macelleria",
+            "farina": "corsia 03 (Farina, Piatti)", "lievito": "corsia 03 (Farina, Piatti)",
 
-            "toast": "toast", "grissini": "toast", "crostini": "toast", "grattuggiato": "toast", "panini": "toast",
-            "barrette": "toast", "caffe": "toast", "marmellata": "toast",
-            
-            "galbusera": "cancelleria",
-            
-            "torta": "merenda", "biscotti": "merenda", "gocciole": "merenda", "lievito": "merenda", "farina": "merenda",
+            "pasta": "corsia 04 (Pasta, Riso)", "tagliatelle": "corsia 04 (Pasta, Riso)", "riso": "corsia 04 (Pasta, Riso)", "penne": "corsia 04 (Pasta, Riso)",
 
-            "pasta": "pasta", "tagliatelle": "pasta", "riso": "pasta", "penne": "pasta",
-            
-            "ketchup": "olio", "olio": "olio", "sugo": "olio", "olio di girasole": "olio", "sale": "olio", "tonno": "olio",
-            "piselli": "olio", "ceci": "olio",
+            "ketchup": "corsia 05 (Olio, Conserve)", "olio": "corsia 05 (Olio, Conserve)", "sugo": "corsia 05 (Olio, Conserve)", "olio di girasole": "corsia 05 (Olio, Conserve)", "sale": "corsia 05 (Olio, Conserve)", "tonno": "corsia 05 (Olio, Conserve)", "piselli": "corsia 05 (Olio, Conserve)", "ceci": "corsia 05 (Olio, Conserve)",
 
-            "carta": "bagno", "profumo": "bagno", "assorbenti": "bagno", "bagno schiuma": "bagno", "dentifricio": "bagno", "creme": "bagno",
-            "fazzoletti": "bagno",
+            "bagno schiuma": "corsia 06 (Cura Corpo, Infanzia)", "creme": "corsia 06 (Cura Corpo, Infanzia)", "profumo": "corsia 06 (Cura Corpo, Infanzia)",
 
-            "detersivo": "lavatrice", 
+            "dentifricio": "corsia 07 (Igiene Orale, Deodoranti)",
 
-            "pastiglia": "cura_casa", "guanti": "cura_casa", "sale lavastoviglie": "cura_casa", "detertisivo piatti": "cura_casa", "sacchi": "cura_casa",
-            "sgrassatore": "cura_casa", "lavapavimenti": "cura_casa", "spugne": "cura_casa", "wcnet": "cura_casa", "scottex": "cura_casa", 
+            "carta": "corsia 08 (Carta Igienica)", "fazzoletti": "corsia 08 (Carta Igienica)", "assorbenti": "corsia 08 (Carta Igienica)",
 
-            "patatine": "snacks", "bretzel": "snacks", "cross": "snacks" , "semi di girasole": "snacks", "arachidi": "snacks",
-            
-            "pera": "succhi", "alluminio": "succhi", 
+            "detersivo": "corsia 09 (Bucato)",
 
-            "the": "bibite", "coca cola": "bibite", "zucchero": "bibite",
+            "pastiglia": "corsia 10 (Pulizia Casa)", "guanti": "corsia 10 (Pulizia Casa)", "sale lavastoviglie": "corsia 10 (Pulizia Casa)", "detertisivo piatti": "corsia 10 (Pulizia Casa)", "sgrassatore": "corsia 10 (Pulizia Casa)", "lavapavimenti": "corsia 10 (Pulizia Casa)", "spugne": "corsia 10 (Pulizia Casa)", "wcnet": "corsia 10 (Pulizia Casa)",
 
-            "ghiaccioli": "surgelati", "cuccioloni": "surgelati", "fragolino": "surgelati", "soffritto": "surgelati", "viennetta": "surgelati", "aglio": "surgelati",
-            "cipolla tritata": "surgelati", "fagiolini": "surgelati", "patatine surgelate": "surgelati", "pizze": "surgelati", "farinata": "surgelati", "vaschette": "surgelati",
-            "tiramisu": "surgelati"
+            "patatine": "corsia 12 (Snack, Succhi)", "bretzel": "corsia 12 (Snack, Succhi)", "cross": "corsia 12 (Snack, Succhi)", "semi di girasole": "corsia 12 (Snack, Succhi)", "arachidi": "corsia 12 (Snack, Succhi)", "pera": "corsia 12 (Snack, Succhi)",
+
+            "alluminio": "corsia 13 (Carta Casa, Alluminio)", "sacchi": "corsia 13 (Carta Casa, Alluminio)", "scottex": "corsia 13 (Carta Casa, Alluminio)",
+
+            "ghiaccioli": "corsia 14 (Surgelati, Bibite)", "cuccioloni": "corsia 14 (Surgelati, Bibite)", "fragolino": "corsia 14 (Surgelati, Bibite)", "soffritto": "corsia 14 (Surgelati, Bibite)", "viennetta": "corsia 14 (Surgelati, Bibite)", "aglio": "corsia 14 (Surgelati, Bibite)", "cipolla tritata": "corsia 14 (Surgelati, Bibite)", "fagiolini": "corsia 14 (Surgelati, Bibite)", "patatine surgelate": "corsia 14 (Surgelati, Bibite)", "pizze": "corsia 14 (Surgelati, Bibite)", "farinata": "corsia 14 (Surgelati, Bibite)", "vaschette": "corsia 14 (Surgelati, Bibite)", "tiramisu": "corsia 14 (Surgelati, Bibite)", "the": "corsia 14 (Surgelati, Bibite)", "coca cola": "corsia 14 (Surgelati, Bibite)",
+
+            "focaccia": "banco panetteria",
+
+            "olive": "banco gastronomia", "prosciutto": "banco gastronomia", "mortadella": "banco gastronomia", "speck": "banco gastronomia", "pollo": "banco gastronomia",
+
+            "latte": "banco freschi", "mozzarelle": "banco freschi", "sottilette": "banco freschi", "pesto": "banco freschi", "tortellini": "banco freschi", "trofie": "banco freschi", "parmiggiano": "banco freschi", "salame": "banco freschi", "burro": "banco freschi",
+
+            "uova": "banco macelleria", "petto": "banco macelleria", "trita": "banco macelleria", "hamburger": "banco macelleria", "salsiccia": "banco macelleria"
         };
 
         // ==========================================
