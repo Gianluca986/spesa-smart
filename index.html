@@ -27,8 +27,15 @@
             margin-bottom: 15px;
             box-sizing: border-box;
         }
+        /* Nuovo layout per i pulsanti */
+        .bottoni-container {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+        }
         button {
-            background-color: #27ae60;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -36,10 +43,19 @@
             border-radius: 8px;
             cursor: pointer;
             width: 100%;
-            max-width: 400px;
-            margin-bottom: 20px;
         }
-        button:active { background-color: #2ecc71; }
+        .btn-ordina {
+            background-color: #27ae60;
+            flex: 2; /* Rende il tasto ordina più largo */
+        }
+        .btn-ordina:active { background-color: #2ecc71; }
+        
+        .btn-pulisci {
+            background-color: #e74c3c;
+            flex: 1; /* Tasto pulisci più stretto */
+        }
+        .btn-pulisci:active { background-color: #c0392b; }
+
         #risultato {
             width: 100%;
             max-width: 400px;
@@ -56,7 +72,6 @@
             border-bottom: 2px solid #ecf0f1;
             padding-bottom: 5px;
         }
-        /* Nuovo stile per le corsie vuote nella Modalità Mappa */
         .corsia-vuota {
             color: #bdc3c7; 
         }
@@ -88,11 +103,26 @@
     <h2>Lista della Spesa</h2>
     
     <textarea id="inputSpesa" placeholder="Incolla qui la lista di WhatsApp..."></textarea>
-    <button onclick="ordinaSpesa()">Ordina per Percorso</button>
+    
+    <div class="bottoni-container">
+        <button class="btn-ordina" onclick="ordinaSpesa()">Ordina per Percorso</button>
+        <button class="btn-pulisci" onclick="pulisciLista()">Pulisci</button>
+    </div>
 
     <div id="risultato"></div>
 
     <script>
+        // ==========================================
+        // CARICAMENTO AUTOMATICO AL RIAVVIO
+        // ==========================================
+        window.onload = function() {
+            const testoSalvato = localStorage.getItem('spesa_testo_input');
+            if (testoSalvato) {
+                document.getElementById('inputSpesa').value = testoSalvato;
+                ordinaSpesa(); // Ricarica la lista in automatico
+            }
+        };
+
         // ==========================================
         // AREA DI CONFIGURAZIONE
         // ==========================================
@@ -157,8 +187,7 @@
 
             "prosciutto": "banco gastronomia", "mortadella": "banco gastronomia", "speck": "banco gastronomia",
 
-            "latte": "banco freschi", "mozzarelle": "banco freschi", "sottilette": "banco freschi",  "tortellini": "banco freschi", "trofie": "banco freschi", "parmiggiano": "banco freschi", "salame": "banco freschi", "burro": "banco freschi", "bresaola": "banco freschi",
-"pesto": "banco freschi",
+            "latte": "banco freschi", "mozzarelle": "banco freschi", "sottilette": "banco freschi",  "tortellini": "banco freschi", "trofie": "banco freschi", "parmiggiano": "banco freschi", "salame": "banco freschi", "burro": "banco freschi", "bresaola": "banco freschi", "pesto": "banco freschi",
 
             "uova": "banco macelleria", "petto di pollo": "banco macelleria", "trita": "banco macelleria", "hamburger": "banco macelleria", "salsiccia": "banco macelleria"
         };
@@ -169,11 +198,17 @@
 
         function ordinaSpesa() {
             const testoInput = document.getElementById('inputSpesa').value;
-            if (!testoInput.trim()) return;
+            
+            // Salva il testo grezzo in memoria
+            localStorage.setItem('spesa_testo_input', testoInput);
+
+            if (!testoInput.trim()) {
+                document.getElementById('risultato').innerHTML = '';
+                return;
+            }
 
             const righe = testoInput.split('\n').map(r => r.trim().toLowerCase()).filter(r => r.length > 0);
             
-            // Ordiniamo le chiavi per evitare bug di sottostringhe (es. "farinata" vs "farina")
             const chiaviOrdinate = Object.keys(catalogoProdotti).sort((a, b) => b.length - a.length);
 
             let listaDaOrdinare = righe.map(nomeProdotto => {
@@ -200,7 +235,6 @@
             const divRisultato = document.getElementById('risultato');
             divRisultato.innerHTML = ''; 
 
-            // Raggruppiamo i prodotti per categoria
             const prodottiPerCategoria = {};
             lista.forEach(item => {
                 if (!prodottiPerCategoria[item.categoria]) {
@@ -209,15 +243,12 @@
                 prodottiPerCategoria[item.categoria].push(item);
             });
 
-            // Se ci sono prodotti sconosciuti, attiviamo la "Modalità Mappa"
             const haSconosciuti = (prodottiPerCategoria["sconosciuto"] && prodottiPerCategoria["sconosciuto"].length > 0);
 
             let categorieDaMostrare = [];
             if (haSconosciuti) {
-                // Prendi tutte le corsie e ordinale
                 categorieDaMostrare = Object.keys(mappaSupermercato).sort((a, b) => mappaSupermercato[a] - mappaSupermercato[b]);
             } else {
-                // Prendi solo le corsie dove c'è roba da comprare e ordinale
                 categorieDaMostrare = Object.keys(prodottiPerCategoria).sort((a, b) => mappaSupermercato[a] - mappaSupermercato[b]);
             }
 
@@ -226,7 +257,6 @@
             categorieDaMostrare.forEach(categoria => {
                 const prodotti = prodottiPerCategoria[categoria] || [];
                 
-                // Mostra la categoria se ha prodotti, OPPURE se siamo in modalità mappa (escludendo "sconosciuto" se vuota)
                 if (prodotti.length > 0 || (haSconosciuti && categoria !== "sconosciuto")) {
                     
                     const titolo = document.createElement('div');
@@ -234,7 +264,6 @@
                     
                     let testoTitolo = categoria.toUpperCase() + (mappaSupermercato[categoria] === 99 ? " (Da cercare)" : "");
                     
-                    // Se la corsia è vuota, aggiungiamo l'etichetta (Vuota) e applichiamo lo stile grigio
                     if (prodotti.length === 0) {
                         titolo.innerText = testoTitolo + " - (Vuota)";
                         titolo.classList.add('corsia-vuota');
@@ -244,7 +273,6 @@
                     
                     divRisultato.appendChild(titolo);
 
-                    // Stampa i prodotti di questa corsia
                     prodotti.forEach(item => {
                         contatoreID++;
                         const container = document.createElement('div');
@@ -253,6 +281,19 @@
                         const checkbox = document.createElement('input');
                         checkbox.type = 'checkbox';
                         checkbox.id = 'prodotto-' + contatoreID;
+                        
+                        // Creiamo una chiave unica per salvare lo stato nel browser
+                        const chiaveSalvataggio = 'spesa_cb_' + item.nomeOriginale.replace(/\s+/g, '_');
+                        
+                        // Ripristina lo stato salvato in memoria
+                        if (localStorage.getItem(chiaveSalvataggio) === 'true') {
+                            checkbox.checked = true;
+                        }
+
+                        // Salva lo stato ogni volta che si clicca
+                        checkbox.addEventListener('change', function() {
+                            localStorage.setItem(chiaveSalvataggio, this.checked);
+                        });
 
                         const label = document.createElement('label');
                         label.htmlFor = 'prodotto-' + contatoreID;
@@ -262,6 +303,24 @@
                         container.appendChild(label);
                         divRisultato.appendChild(container);
                     });
+                }
+            });
+        }
+
+        // ==========================================
+        // PULISCI TUTTO
+        // ==========================================
+        function pulisciLista() {
+            // Svuota il box di testo
+            document.getElementById('inputSpesa').value = '';
+            // Svuota i risultati
+            document.getElementById('risultato').innerHTML = '';
+            
+            // Pulisce tutta la memoria salvata legata alla spesa
+            localStorage.removeItem('spesa_testo_input');
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('spesa_cb_')) {
+                    localStorage.removeItem(key);
                 }
             });
         }
