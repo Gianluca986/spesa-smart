@@ -56,6 +56,10 @@
             border-bottom: 2px solid #ecf0f1;
             padding-bottom: 5px;
         }
+        /* Nuovo stile per le corsie vuote nella Modalità Mappa */
+        .corsia-vuota {
+            color: #bdc3c7; 
+        }
         .prodotto-container {
             display: flex;
             align-items: center;
@@ -168,15 +172,13 @@
             if (!testoInput.trim()) return;
 
             const righe = testoInput.split('\n').map(r => r.trim().toLowerCase()).filter(r => r.length > 0);
-
-            // FIX: Ordiniamo le chiavi del catalogo dalla più lunga alla più corta.
-            // Così "farinata" (8 caratteri) viene controllata prima di "farina" (6 caratteri).
+            
+            // Ordiniamo le chiavi per evitare bug di sottostringhe (es. "farinata" vs "farina")
             const chiaviOrdinate = Object.keys(catalogoProdotti).sort((a, b) => b.length - a.length);
 
             let listaDaOrdinare = righe.map(nomeProdotto => {
                 let categoriaAssegnata = "sconosciuto";
                 
-                // Usiamo l'array di chiavi ordinate invece di Object.entries casuale
                 for (const prodottoCatalogo of chiaviOrdinate) {
                     if (nomeProdotto.includes(prodottoCatalogo)) {
                         categoriaAssegnata = catalogoProdotti[prodottoCatalogo];
@@ -191,7 +193,6 @@
                 };
             });
 
-            listaDaOrdinare.sort((a, b) => a.ordineCorsia - b.ordineCorsia);
             mostraRisultato(listaDaOrdinare);
         }
 
@@ -199,34 +200,69 @@
             const divRisultato = document.getElementById('risultato');
             divRisultato.innerHTML = ''; 
 
-            let corsiaAttuale = "";
+            // Raggruppiamo i prodotti per categoria
+            const prodottiPerCategoria = {};
+            lista.forEach(item => {
+                if (!prodottiPerCategoria[item.categoria]) {
+                    prodottiPerCategoria[item.categoria] = [];
+                }
+                prodottiPerCategoria[item.categoria].push(item);
+            });
+
+            // Se ci sono prodotti sconosciuti, attiviamo la "Modalità Mappa"
+            const haSconosciuti = (prodottiPerCategoria["sconosciuto"] && prodottiPerCategoria["sconosciuto"].length > 0);
+
+            let categorieDaMostrare = [];
+            if (haSconosciuti) {
+                // Prendi tutte le corsie e ordinale
+                categorieDaMostrare = Object.keys(mappaSupermercato).sort((a, b) => mappaSupermercato[a] - mappaSupermercato[b]);
+            } else {
+                // Prendi solo le corsie dove c'è roba da comprare e ordinale
+                categorieDaMostrare = Object.keys(prodottiPerCategoria).sort((a, b) => mappaSupermercato[a] - mappaSupermercato[b]);
+            }
+
             let contatoreID = 0; 
 
-            lista.forEach(item => {
-                if (item.categoria !== corsiaAttuale) {
+            categorieDaMostrare.forEach(categoria => {
+                const prodotti = prodottiPerCategoria[categoria] || [];
+                
+                // Mostra la categoria se ha prodotti, OPPURE se siamo in modalità mappa (escludendo "sconosciuto" se vuota)
+                if (prodotti.length > 0 || (haSconosciuti && categoria !== "sconosciuto")) {
+                    
                     const titolo = document.createElement('div');
                     titolo.className = 'corsia-titolo';
-                    titolo.innerText = item.categoria.toUpperCase() + (item.ordineCorsia === 99 ? " (Da cercare)" : "");
+                    
+                    let testoTitolo = categoria.toUpperCase() + (mappaSupermercato[categoria] === 99 ? " (Da cercare)" : "");
+                    
+                    // Se la corsia è vuota, aggiungiamo l'etichetta (Vuota) e applichiamo lo stile grigio
+                    if (prodotti.length === 0) {
+                        titolo.innerText = testoTitolo + " - (Vuota)";
+                        titolo.classList.add('corsia-vuota');
+                    } else {
+                        titolo.innerText = testoTitolo;
+                    }
+                    
                     divRisultato.appendChild(titolo);
-                    corsiaAttuale = item.categoria;
+
+                    // Stampa i prodotti di questa corsia
+                    prodotti.forEach(item => {
+                        contatoreID++;
+                        const container = document.createElement('div');
+                        container.className = 'prodotto-container';
+
+                        const checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = 'prodotto-' + contatoreID;
+
+                        const label = document.createElement('label');
+                        label.htmlFor = 'prodotto-' + contatoreID;
+                        label.innerText = item.nomeOriginale.charAt(0).toUpperCase() + item.nomeOriginale.slice(1);
+
+                        container.appendChild(checkbox);
+                        container.appendChild(label);
+                        divRisultato.appendChild(container);
+                    });
                 }
-
-                contatoreID++;
-                
-                const container = document.createElement('div');
-                container.className = 'prodotto-container';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = 'prodotto-' + contatoreID;
-
-                const label = document.createElement('label');
-                label.htmlFor = 'prodotto-' + contatoreID;
-                label.innerText = item.nomeOriginale.charAt(0).toUpperCase() + item.nomeOriginale.slice(1);
-
-                container.appendChild(checkbox);
-                container.appendChild(label);
-                divRisultato.appendChild(container);
             });
         }
     </script>
